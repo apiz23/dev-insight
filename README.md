@@ -1,36 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 DevInsight — GitHub Developer Analyzer
 
-## Getting Started
+DevInsight is an AI-powered GitHub developer analysis platform that evaluates a developer’s profile, activity, and technology stack to generate:
 
-First, run the development server:
+* 📊 Developer score
+* 🧠 AI hiring insights
+* 📈 Activity analytics
+* 🧩 Skill distribution visualization
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Built as a full-stack project combining **Next.js**, **FastAPI**, **GitHub API**, and **JamAI**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔍 GitHub Profile Analysis
 
-## Learn More
+* Fetch public GitHub user data
+* Repository count analysis
+* Follower & activity overview
+* Account age calculation
+* Profile metadata extraction
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧮 Developer Scoring System
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Custom scoring model based on:
 
-## Deploy on Vercel
+* 📂 Repository activity
+* 🌐 Language diversity
+* 🕒 Experience (account age)
+* 📊 Consistency (repos per year)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Outputs:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Overall score (0-100)
+* Developer level classification
+* Score breakdown visualization
+
+---
+
+## 📊 Data Visualizations
+
+### 🥧 Language Distribution Pie Chart
+
+* Shows most used programming languages
+* Weighted by repository usage
+* Theme-integrated colors
+
+### 📡 Developer Radar Chart
+
+Displays:
+
+* Activity level
+* Skill diversity
+* Experience maturity
+* Consistency trend
+
+Helps recruiters quickly assess developer profile shape.
+
+### 📅 Activity Timeline
+
+Shows developer growth over time:
+
+* Repository creation trends
+* Activity patterns
+* Development timeline insight
+
+---
+
+## 🤖 AI Developer Insights
+
+Integrated with **JamAI** table-based inference.
+
+Generates structured insights:
+
+* Developer archetype
+* Experience assessment
+* Technical focus
+* Activity pattern
+* Strength signals
+* Risk signals
+* Hiring recommendation
+* Ideal role suggestion
+* Growth advice
+
+AI outputs are generated from a structured profile summary built from GitHub data.
+
+---
+
+## 🔌 API Architecture
+
+### Next.js API Routes
+
+* `/api/github` → fetches GitHub profile & repos
+* `/api/ai` → sends developer summary to backend AI service
+
+### FastAPI Backend
+
+* `/analyze` → pushes profile summary to JamAI table
+* Returns structured AI insights
+
+---
+
+## 🧱 Tech Stack
+
+### Frontend
+
+* Next.js (App Router)
+* TypeScript
+* TailwindCSS
+* shadcn/ui
+* Recharts
+* Framer Motion
+
+### Backend
+
+* FastAPI
+* JamAI SDK
+* GitHub REST API
+
+---
+
+# 🧠 Future Improvements (Planned)
+
+* Contribution heatmap analysis
+* Commit frequency scoring
+* Repo quality metrics (stars, forks, issues)
+* AI career trajectory prediction
+* Resume export from GitHub profile
+* Public shareable developer report link
+
+---
+
+# 📌 Project Purpose
+
+This project was built to:
+
+* Improve full-stack engineering skills
+* Explore real AI product architecture
+* Demonstrate developer profiling systems
+* Serve as a portfolio-level SaaS prototype
+
+---
+
+# 👨‍💻 Author
+
+Built by **Hafiz**
+Software Engineering Student
+Universiti Tun Hussein Onn Malaysia
+
+Exploring AI-powered developer analytics & modern full-stack architecture.
+
+---
+
+# ⭐ If you like this project
+
+Give it a ⭐ on GitHub and feel free to fork and experiment!
