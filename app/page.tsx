@@ -7,6 +7,7 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
+	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
@@ -39,11 +40,15 @@ import {
 	Clock,
 	CheckCircle2,
 	XCircle,
-	Menu,
-	X,
+	Info,
+	Sparkles,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion } from "framer-motion";
+import { DeveloperRadar } from "@/components/charts/developer-radar";
+import { ActivityTimeline } from "@/components/charts/activity-timeline";
+import { LanguagePie } from "@/components/charts/language-pie";
+import { generateAISummary } from "@/lib/ai";
 
 type GitHubUser = {
 	login: string;
@@ -65,10 +70,11 @@ type GitHubResponse = {
 	user: GitHubUser;
 	repoCount: number;
 	languages: Record<string, number>;
+	repos: any[];
 };
 
 export default function Home() {
-	const [username, setUsername] = useState("torvalds");
+	const [username, setUsername] = useState("");
 	const [user, setUser] = useState<GitHubUser | null>(null);
 	const [languages, setLanguages] = useState<Record<string, number> | null>(
 		null,
@@ -79,7 +85,9 @@ export default function Home() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [rateLimit, setRateLimit] = useState(false);
-
+	const [repos, setRepos] = useState<any[]>([]);
+	const [aiSummary, setAiSummary] = useState<any>(null);
+	const [aiLoading, setAiLoading] = useState(false);
 	const fetchUser = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!username.trim()) return;
@@ -104,22 +112,23 @@ export default function Home() {
 
 			const parsed: GitHubResponse = data;
 
-			setUser(parsed.user);
-			setLanguages(parsed.languages);
-			setRepoCount(parsed.repoCount);
-
 			const computedScore = calculateDeveloperScore({
 				repoCount: parsed.repoCount,
 				languages: parsed.languages,
 				createdAt: parsed.user.created_at,
 			});
 
+			setUser(parsed.user);
+			setLanguages(parsed.languages);
+			setRepoCount(parsed.repoCount);
 			setScore(computedScore);
+			setRepos(parsed.repos || []);
+
+			// ✅ CALL AI HERE WITH FRESH DATA
+			await fetchAI(parsed, computedScore);
 		} catch (err: any) {
 			setError(err.message || "Failed to fetch user");
 			setUser(null);
-		} finally {
-			setLoading(false);
 		}
 	};
 
@@ -158,6 +167,27 @@ export default function Home() {
 		}
 	};
 
+	const fetchAI = async (parsed: GitHubResponse, computedScore: any) => {
+		const summary = `
+GitHub Username: ${parsed.user.login}
+Repositories: ${parsed.repoCount}
+Followers: ${parsed.user.followers}
+Languages: ${Object.keys(parsed.languages).join(", ")}
+Score: ${computedScore.total}
+Level: ${computedScore.level}
+`.trim();
+
+		try {
+			setAiLoading(true);
+			const res = await generateAISummary(summary);
+			setAiSummary(res.output);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			setAiLoading(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			{/* Hero Section */}
@@ -176,10 +206,10 @@ export default function Home() {
 					>
 						<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
 							<Rocket className="h-4 w-4 text-primary" />
-							<span className="text-sm font-medium text-primary">DevInsight Pro</span>
+							<span className="text-sm font-medium text-primary">DevInsight</span>
 						</div>
 						<h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-							<span className="bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
+							<span className="bg-linear-to-r from-primary to-chart-2 bg-clip-text text-transparent">
 								GitHub Developer
 							</span>
 							<br />
@@ -315,15 +345,15 @@ export default function Home() {
 						>
 							{/* Profile Card */}
 							<Card className="shadow-xl overflow-hidden border-border py-0">
-								<div className="h-40 bg-gradient-to-r from-primary/30 via-primary/20 to-chart-2/20 relative overflow-hidden">
-									<div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_40%)]" />{" "}
+								<div className="h-40 bg-linear-to-r from-primary/30 via-primary/20 to-chart-2/20 relative overflow-hidden">
+									<div className="absolute inset-0 opacity-20 bg-[radial-linear(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_40%)]" />{" "}
 								</div>
 
 								<CardContent className="p-6 relative ">
 									<div className="absolute -top-16 left-6">
 										<Avatar className="h-28 w-28 border-4 border-background shadow-xl">
 											<AvatarImage src={user.avatar_url} alt={user.login} />
-											<AvatarFallback className="text-3xl bg-gradient-to-br from-primary to-chart-2 text-primary-foreground">
+											<AvatarFallback className="text-3xl bg-linear-to-br from-primary to-chart-2 text-primary-foreground">
 												{user.login.slice(0, 2).toUpperCase()}
 											</AvatarFallback>
 										</Avatar>
@@ -381,70 +411,73 @@ export default function Home() {
 							</Card>
 
 							{/* Stats & Score Grid */}
-<div className="space-y-6">
-	{/* Stats Cards - 2x2 Grid */}
-	<div className="grid grid-cols-2 gap-3">
-		<StatCard
-			icon={Users}
-			label="Followers"
-			value={user.followers}
-			color="bg-chart-1/10 border-chart-1/20"
-			iconColor="text-chart-1"
-		/>
-		<StatCard
-			icon={Users}
-			label="Following"
-			value={user.following}
-			color="bg-chart-2/10 border-chart-2/20"
-			iconColor="text-chart-2"
-		/>
-		<StatCard
-			icon={GitFork}
-			label="Repositories"
-			value={repoCount ?? 0}
-			color="bg-chart-3/10 border-chart-3/20"
-			iconColor="text-chart-3"
-		/>
-		<StatCard
-			icon={Star}
-			label="Languages"
-			value={languages ? Object.keys(languages).length : 0}
-			color="bg-chart-4/10 border-chart-4/20"
-			iconColor="text-chart-4"
-		/>
-	</div>
+							<div className="space-y-6">
+								{/* Stats Cards - 2x2 Grid */}
+								<div className="grid grid-cols-2 gap-3">
+									<StatCard
+										icon={Users}
+										label="Followers"
+										value={user.followers}
+										color="bg-chart-1/10 border-chart-1/20"
+										iconColor="text-chart-1"
+									/>
+									<StatCard
+										icon={Users}
+										label="Following"
+										value={user.following}
+										color="bg-chart-2/10 border-chart-2/20"
+										iconColor="text-chart-2"
+									/>
+									<StatCard
+										icon={GitFork}
+										label="Repositories"
+										value={repoCount ?? 0}
+										color="bg-chart-3/10 border-chart-3/20"
+										iconColor="text-chart-3"
+									/>
+									<StatCard
+										icon={Star}
+										label="Languages"
+										value={languages ? Object.keys(languages).length : 0}
+										color="bg-chart-4/10 border-chart-4/20"
+										iconColor="text-chart-4"
+									/>
+								</div>
 
-	{/* Score Card */}
-	<Card className="border-border">
-		<CardContent className="p-5">
-			<div className="flex items-center gap-3 mb-4">
-				<div className="p-2 rounded-lg bg-primary/10">
-					<Trophy className="h-5 w-5 text-primary" />
-				</div>
-				<div>
-					<p className="text-sm text-muted-foreground">Developer Score</p>
-					<p className="font-semibold">Overall Rating</p>
-				</div>
-			</div>
+								{/* Score Card */}
+								<Card className="border-border">
+									<CardContent className="p-5">
+										<div className="flex items-center gap-3 mb-4">
+											<div className="p-2 rounded-lg bg-primary/10">
+												<Trophy className="h-5 w-5 text-primary" />
+											</div>
+											<div>
+												<p className="text-sm text-muted-foreground">Developer Score</p>
+												<p className="font-semibold">Overall Rating</p>
+											</div>
+										</div>
 
-			<div className="flex items-center justify-between gap-4">
-				<div className="text-5xl font-bold text-primary">{score.total}</div>
-				<Badge variant="outline" className="px-3 py-1 text-xs">
-					{score.level}
-				</Badge>
-			</div>
+										<div className="flex items-center justify-between gap-4">
+											<div className="text-5xl font-bold text-primary">{score.total}</div>
+											<Badge variant="outline" className="px-3 py-1 text-xs">
+												{score.level}
+											</Badge>
+										</div>
 
-			{/* Progress Bar */}
-			<div className="mt-4 space-y-1">
-				<Progress value={score.total} className="h-1.5 bg-muted [&>div]:bg-primary" />
-				<div className="flex justify-between text-xs text-muted-foreground">
-					<span>0</span>
-					<span>100</span>
-				</div>
-			</div>
-		</CardContent>
-	</Card>
-</div>
+										{/* Progress Bar */}
+										<div className="mt-4 space-y-1">
+											<Progress
+												value={score.total}
+												className="h-1.5 bg-muted [&>div]:bg-primary"
+											/>
+											<div className="flex justify-between text-xs text-muted-foreground">
+												<span>0</span>
+												<span>100</span>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							</div>
 
 							{/* Tabs for Detailed Analysis */}
 							<Tabs defaultValue="breakdown" className="space-y-4">
@@ -593,6 +626,117 @@ export default function Home() {
 									</div>
 								</CardContent>
 							</Card>
+
+							{/* Charts Section */}
+							{(languages || score || repos.length > 0) && (
+								<div className="space-y-6 mt-6">
+									{/* Language Pie Chart */}
+									{languages && Object.keys(languages).length > 0 && (
+										<LanguagePie languages={languages} />
+									)}
+
+									{/* Radar Chart */}
+									{score && <DeveloperRadar score={score} />}
+
+									{/* Activity Timeline */}
+									{repos.length > 0 && <ActivityTimeline repos={repos} />}
+								</div>
+							)}
+							{aiLoading && (
+								<div className="flex flex-col items-center justify-center p-8 border border-border rounded-lg bg-muted/20">
+									<div className="flex items-center gap-3 mb-3">
+										<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+										<p className="text-sm font-medium">Generating AI insights...</p>
+									</div>
+
+									{/* Cold start warning for free tier */}
+									<div className="flex items-start gap-2 max-w-md text-center">
+										<Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+										<p className="text-xs text-muted-foreground">
+											<span className="font-medium text-amber-600 dark:text-amber-400">
+												Note:
+											</span>{" "}
+											Running on free tier — first request may take 30-50 seconds to wake
+											up the server. Thanks for your patience! ☕
+										</p>
+									</div>
+								</div>
+							)}
+
+							{aiSummary && (
+								<Card className="overflow-hidden border-primary/10 shadow-sm py-0">
+									<CardHeader className="bg-linear-to-r from-primary/5 via-transparent to-transparent py-4">
+										<div className="flex items-center gap-2">
+											<div className="p-2 rounded-lg bg-primary/10">
+												<Sparkles className="h-4 w-4 text-primary" />
+											</div>
+											<div>
+												<CardTitle className="text-lg">AI Developer Insights</CardTitle>
+												<p className="text-xs text-muted-foreground mt-0.5">
+													Powered by advanced analytics
+												</p>
+											</div>
+										</div>
+									</CardHeader>
+									<CardContent className="pt-4">
+										<div className="space-y-4">
+											{Object.entries(aiSummary).map(([k, v], index) => {
+												let text = "";
+												let confidence = null;
+
+												if (typeof v === "string") {
+													text = v;
+												} else if (
+													v &&
+													typeof v === "object" &&
+													"choices" in v &&
+													Array.isArray((v as any).choices)
+												) {
+													text = (v as any).choices?.[0]?.message?.content ?? "";
+												}
+
+												// Extract confidence if available (you can adjust this logic)
+												if (v && typeof v === "object" && "confidence" in v) {
+													confidence = (v as any).confidence;
+												}
+
+												// Only render if there's content
+												if (!text || text === "No data") return null;
+
+												return (
+													<div
+														key={k}
+														className="group p-3 rounded-lg border border-border/50 bg-card hover:border-primary/20 hover:bg-muted/20 transition-all duration-200"
+													>
+														<div className="flex items-start justify-between gap-2 mb-1.5">
+															<div className="flex items-center gap-2">
+																<div className="w-1 h-4 rounded-full bg-primary/40 group-hover:bg-primary transition-colors" />
+																<p className="font-medium text-sm capitalize">
+																	{k.replace(/_/g, " ")}
+																</p>
+															</div>
+															{confidence && (
+																<span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+																	{Math.round(confidence * 100)}% confidence
+																</span>
+															)}
+														</div>
+														<p className="text-sm text-muted-foreground pl-4 leading-relaxed">
+															{text}
+														</p>
+													</div>
+												);
+											})}
+										</div>
+									</CardContent>
+									<CardFooter className="border-t border-border/50 bg-muted/10 px-6 py-3">
+										<p className="text-xs text-muted-foreground flex items-center gap-1.5">
+											<Info className="h-3 w-3" />
+											Analysis based on repository data and contribution patterns
+										</p>
+									</CardFooter>
+								</Card>
+							)}
 						</motion.div>
 					)}
 
@@ -623,7 +767,7 @@ export default function Home() {
 											Try: gaearon
 										</span>
 										<span className="px-3 py-1 rounded-full bg-accent border border-border">
-											Try: sindresorhus
+											Try: apiz23
 										</span>
 									</div>
 								</CardContent>
@@ -637,16 +781,16 @@ export default function Home() {
 }
 
 // Helper Components
-function StatCard({ 
-	icon: Icon, 
-	label, 
-	value, 
+function StatCard({
+	icon: Icon,
+	label,
+	value,
 	color,
-	iconColor 
-}: { 
-	icon: any; 
-	label: string; 
-	value: number | string; 
+	iconColor,
+}: {
+	icon: any;
+	label: string;
+	value: number | string;
 	color: string;
 	iconColor: string;
 }) {
@@ -654,11 +798,11 @@ function StatCard({
 		<motion.div
 			whileHover={{ y: -2, scale: 1.02 }}
 			transition={{ type: "spring", stiffness: 300, damping: 20 }}
-			className={`relative overflow-hidden p-4 rounded-xl border bg-gradient-to-br ${color} backdrop-blur-sm transition-all hover:shadow-md`}
+			className={`relative overflow-hidden p-4 rounded-xl border bg-linear-to-br ${color} backdrop-blur-sm transition-all hover:shadow-md`}
 		>
 			{/* Background Pattern */}
-			<div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(ellipse_at_center,transparent_60%,black)]" />
-			
+			<div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-linear(ellipse_at_center,transparent_60%,black)]" />
+
 			{/* Content */}
 			<div className="relative z-10">
 				<div className="flex items-center justify-between mb-2">
@@ -670,7 +814,7 @@ function StatCard({
 					</span>
 				</div>
 				<div className={`text-2xl font-bold ${iconColor}`}>
-					{typeof value === 'number' ? value.toLocaleString() : value}
+					{typeof value === "number" ? value.toLocaleString() : value}
 				</div>
 			</div>
 		</motion.div>
@@ -741,7 +885,7 @@ function LanguageBar({ language, count }: { language: string; count: number }) {
 					initial={{ width: 0 }}
 					animate={{ width: `${Math.min(count * 10, 100)}%` }}
 					transition={{ duration: 0.8, delay: 0.2 }}
-					className="h-full bg-gradient-to-r from-primary to-chart-2 rounded-full"
+					className="h-full bg-linear-to-r from-primary to-chart-2 rounded-full"
 				/>
 			</div>
 			<span className="text-xs text-muted-foreground">{count} repos</span>

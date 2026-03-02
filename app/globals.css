@@ -11,7 +11,7 @@
 	--card-foreground: #250d31;
 	--popover: #ffffff;
 	--popover-foreground: #250d31;
-	--primary: #b7fd3a;
+	--primary: #5b8c3d; /* Darker, more muted green */
 	--primary-foreground: #ffffff;
 	--secondary: #51518a;
 	--secondary-foreground: #ffffff;
@@ -23,20 +23,20 @@
 	--destructive-foreground: #fafafa;
 	--border: #ffffff;
 	--input: #ffffff;
-	--ring: #b7fd3a;
+	--ring: #5b8c3d; /* Matching the primary color */
 	--chart-1: #5e5ea0;
-	--chart-2: #c2ff5a;
-	--chart-3: #dcffbb;
+	--chart-2: #6b8c42; /* Darker chart green */
+	--chart-3: #8ba86b; /* Muted light green */
 	--chart-4: #888888;
 	--chart-5: #999999;
 	--sidebar: #ffffff;
 	--sidebar-foreground: #250d31;
-	--sidebar-primary: #b7fd3a;
+	--sidebar-primary: #5b8c3d; /* Darker green for sidebar */
 	--sidebar-primary-foreground: #ffffff;
 	--sidebar-accent: #ffffff;
 	--sidebar-accent-foreground: #250d31;
 	--sidebar-border: #ffffff;
-	--sidebar-ring: #b7fd3a;
+	--sidebar-ring: #5b8c3d; /* Matching sidebar primary */
 	--font-sans: Geist Mono, ui-monospace, monospace;
 	--font-serif: serif;
 	--font-mono: JetBrains Mono, monospace;

@@ -57,6 +57,12 @@ export async function GET(req: NextRequest) {
 			user,
 			repoCount: repos.length,
 			languages: languageCount,
+			repos: repos.map((r: any) => ({
+				name: r.name,
+				created_at: r.created_at,
+				updated_at: r.updated_at,
+				pushed_at: r.pushed_at,
+			})),
 		});
 	} catch (err) {
 		return NextResponse.json({ error: "Server error" }, { status: 500 });
