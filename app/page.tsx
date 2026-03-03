@@ -971,14 +971,12 @@ Level: ${computedScore.level}
 													<p className="text-sm font-medium">Generating AI insights...</p>
 												</div>
 
-												<div className="flex items-start gap-2 max-w-md text-center">
-													<Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+												<div className="flex items-start gap-2 text-center">
+													<Sparkles className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
 													<p className="text-xs text-muted-foreground">
-														<span className="font-medium text-amber-600 dark:text-amber-400">
-															Note:
-														</span>{" "}
-														Running on free tier — first request may take 30-50 seconds to
-														wake up the server. Thanks for your patience! ☕
+														<span className="font-medium text-primary">Processing:</span>{" "}
+														Analyzing developer data with advanced AI models. This typically
+														takes just a few seconds.
 													</p>
 												</div>
 											</motion.div>
