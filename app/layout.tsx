@@ -53,19 +53,35 @@ export default function RootLayout({
 				>
 					<TooltipProvider>
 						<div className="relative min-h-screen flex flex-col">
-							<div className="fixed inset-0 -z-10 opacity-60">
-								<DarkVeil
-									hueShift={0}
-									noiseIntensity={0}
-									scanlineIntensity={0}
-									speed={1.5}
-									scanlineFrequency={0}
-									warpAmount={2}
-								/>
+							<div className="fixed inset-0 -z-10">
+								<div className="absolute inset-0" style={{ filter: "blur(2px)" }}>
+									<DarkVeil
+										hueShift={0}
+										noiseIntensity={0}
+										scanlineIntensity={0}
+										speed={1.5}
+										scanlineFrequency={0}
+										warpAmount={2}
+									/>
+								</div>
 							</div>
+							{/* <div className="fixed inset-0 -z-10">
+								<div className="absolute inset-0" style={{ filter: "blur(5px)" }}>
+									<Beams
+										beamWidth={3}
+										beamHeight={30}
+										beamNumber={20}
+										lightColor="#ffffff"
+										speed={2}
+										noiseIntensity={1.75}
+										scale={0.2}
+										rotation={300}
+									/>
+								</div>
+							</div> */}
 
 							{/* Content */}
-							<Navbar />
+							{/* <Navbar /> */}
 							<main className="flex-1 relative z-0 ">{children}</main>
 							<Footer />
 						</div>

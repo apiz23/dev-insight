@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Footer() {
 	const currentYear = new Date().getFullYear();
@@ -66,12 +67,17 @@ export default function Footer() {
 						className="flex flex-col items-center lg:items-start gap-2"
 					>
 						<div className="flex items-center gap-2">
-							<div className="relative">
-								<div className="absolute inset-0 rounded-full bg-primary/20 blur-md" />
-								<Sparkles className="h-5 w-5 text-primary relative" />
+							<div className="relative w-8 h-8">
+								<Image
+									src="/icons/favicon-32x32.png"
+									alt="DevInsight Logo"
+									fill
+									className="object-contain"
+									priority
+								/>
 							</div>
 							<span className="text-lg font-semibold bg-linear-to-r from-primary to-chart-2 bg-clip-text text-transparent">
-								DevInsight Pro
+								DevInsight
 							</span>
 						</div>
 						<p className="text-sm text-muted-foreground max-w-md text-center lg:text-left">
@@ -155,7 +161,7 @@ export default function Footer() {
 				>
 					{/* Copyright */}
 					<p className="text-xs text-muted-foreground/70 text-center sm:text-left">
-						© {currentYear} DevInsight Pro. All rights reserved.
+						© {currentYear} DevInsight. All rights reserved.
 						<span className="hidden sm:inline mx-2">•</span>
 						<br className="sm:hidden" />
 						Version 2.0.1

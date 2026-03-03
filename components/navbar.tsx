@@ -2,8 +2,8 @@
 
 import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
-import { Github, Rocket } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
 	return (
@@ -12,9 +12,16 @@ export default function Navbar() {
 				<div className="flex h-16 items-center justify-center">
 					{/* Logo and Title */}
 					<div className="flex items-center gap-2">
-						<div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-							<Rocket className="h-4 w-4 text-primary" />
+						<div className="w-9 h-9 relative">
+							<Image
+								src="/icons/favicon-32x32.png"
+								alt="DevInsight Logo"
+								fill
+								className="object-contain"
+								priority
+							/>
 						</div>
+
 						<span className="font-bold text-lg">
 							<span className="bg-linear-to-r from-primary to-chart-2 bg-clip-text text-transparent">
 								DevInsight

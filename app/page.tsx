@@ -66,29 +66,8 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type GitHubUser = {
-	login: string;
-	name: string;
-	avatar_url: string;
-	bio: string;
-	public_repos: number;
-	followers: number;
-	following: number;
-	location: string;
-	blog: string;
-	twitter_username: string;
-	company: string;
-	html_url: string;
-	created_at: string;
-};
-
-type GitHubResponse = {
-	user: GitHubUser;
-	repoCount: number;
-	languages: Record<string, number>;
-	repos: any[];
-};
+import Image from "next/image";
+import { GitHubResponse, GitHubUser } from "@/lib/types";
 
 export default function Home() {
 	const [username, setUsername] = useState("");
@@ -255,11 +234,6 @@ Level: ${computedScore.level}
 			<div className="min-h-screen text-foreground">
 				{/* Hero Section */}
 				<section className="relative overflow-hidden py-16 md:py-24">
-					<div className="absolute inset-0 -z-10">
-						<div className="absolute left-1/2 top-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
-						<div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-chart-2/5 blur-[100px]" />
-					</div>
-
 					<div className="max-w-5xl bg-none mx-auto px-4">
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
@@ -272,7 +246,15 @@ Level: ${computedScore.level}
 								transition={{ duration: 0.2 }}
 								className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 cursor-pointer"
 							>
-								<Rocket className="h-4 w-4 text-primary" />
+								<div className="relative w-8 h-8">
+									<Image
+										src="/icons/favicon-32x32.png"
+										alt="DevInsight Logo"
+										fill
+										className="object-contain"
+										priority
+									/>
+								</div>{" "}
 								<span className="text-sm font-medium text-primary">DevInsight</span>
 							</motion.div>
 							<h1 className="text-5xl md:text-6xl font-bold tracking-tight">
@@ -282,7 +264,7 @@ Level: ${computedScore.level}
 								<br />
 								<span className="text-foreground">Analyzer & Score</span>
 							</h1>
-							<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+							<p className="text-lg text-foreground max-w-2xl mx-auto">
 								Get deep insights into developer activity, technology stack, and
 								experience level with our comprehensive scoring system
 							</p>
@@ -338,7 +320,7 @@ Level: ${computedScore.level}
 							transition={{ duration: 0.6, delay: 0.2 }}
 						>
 							<Card className="border-border shadow-lg bg-card/50 backdrop-blur-sm">
-								<CardContent className="p-6">
+								<CardContent className="p-4">
 									<form onSubmit={fetchUser} className="flex flex-col sm:flex-row gap-3">
 										<div className="flex-1 relative">
 											<Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1097,7 +1079,7 @@ Level: ${computedScore.level}
 									exit={{ opacity: 0 }}
 									className="space-y-6"
 								>
-									<Skeleton className="h-[400px] w-full rounded-xl" />
+									<Skeleton className="h-100 w-full rounded-xl" />
 									<div className="grid grid-cols-2 gap-3">
 										{[1, 2, 3, 4].map((i) => (
 											<Skeleton key={i} className="h-24 w-full rounded-xl" />
