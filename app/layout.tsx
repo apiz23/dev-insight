@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import DarkVeil from "@/components/DarkVeil";
 
 const fontSans = Inter({
 	subsets: ["latin"],
@@ -46,14 +47,28 @@ export default function RootLayout({
 			>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 					disableTransitionOnChange
 				>
 					<TooltipProvider>
-						<Navbar />
-						{children}
-						<Footer />
+						<div className="relative min-h-screen flex flex-col">
+							<div className="fixed inset-0 -z-10 opacity-60">
+								<DarkVeil
+									hueShift={0}
+									noiseIntensity={0}
+									scanlineIntensity={0}
+									speed={1.5}
+									scanlineFrequency={0}
+									warpAmount={2}
+								/>
+							</div>
+
+							{/* Content */}
+							<Navbar />
+							<main className="flex-1 relative z-0 ">{children}</main>
+							<Footer />
+						</div>
 					</TooltipProvider>
 				</ThemeProvider>
 			</body>
