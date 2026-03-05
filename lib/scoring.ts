@@ -11,36 +11,28 @@ export function calculateDeveloperScore({
 		(Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365);
 
 	const uniqueLangs = Object.keys(languages).length;
-	const totalLangUsage = Object.values(languages).reduce((a, b) => a + b, 0);
+	const langValues = Object.values(languages);
+
+	const totalLangUsage = langValues.reduce((a, b) => a + b, 0);
 
 	const topLangUsage =
-		Math.max(...Object.values(languages), 0) / Math.max(totalLangUsage, 1);
+		(langValues.length ? Math.max(...langValues) : 0) /
+		Math.max(totalLangUsage, 1);
 
-	// 1️⃣ Activity (log scaled)
 	const activity = Math.min(Math.round(Math.log10(repoCount + 1) * 12), 25);
 
-	// 2️⃣ Consistency (repos per year, log scaled)
 	const reposPerYear = repoCount / Math.max(years, 1);
 	const consistency = Math.min(
 		Math.round(Math.log10(reposPerYear + 1) * 12),
 		20,
 	);
 
-	// 3️⃣ Experience (non-linear growth)
-	const experience = Math.min(Math.round(years * 2), 15);
+	const experience = Math.min(Math.round(Math.log2(years + 1) * 5), 15);
 
-	// 4️⃣ Diversity (languages)
-	const diversity = Math.min(uniqueLangs * 2, 15);
+	const diversity = Math.min(Math.round(Math.log2(uniqueLangs + 1) * 5), 15);
 
-	// 5️⃣ Focus score (specialist vs random)
-	const focus =
-		topLangUsage > 0.6
-			? 10 // strong specialist
-			: topLangUsage > 0.4
-				? 7
-				: 4;
+	const focus = topLangUsage > 0.6 ? 10 : topLangUsage > 0.4 ? 7 : 4;
 
-	// 6️⃣ Momentum (recent activity proxy)
 	const momentum =
 		reposPerYear > 20 ? 15 : reposPerYear > 10 ? 10 : reposPerYear > 5 ? 6 : 2;
 

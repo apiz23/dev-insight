@@ -25,46 +25,92 @@ export async function GET(req: NextRequest) {
 
 		const user = await userRes.json();
 
-		// 2️⃣ Fetch repos (only public, first 100)
-		const reposRes = await fetch(
-			`https://api.github.com/users/${username}/repos?per_page=100&type=owner&sort=updated`,
-			{ headers, cache: "no-store" },
-		);
+		let allRepos: any[] = [];
+		let page = 1;
+		let hasMore = true;
 
-		const repos = await reposRes.json();
+		while (hasMore) {
+			const reposRes = await fetch(
+				`https://api.github.com/users/${username}/repos?per_page=100&page=${page}&sort=updated`,
+				{ headers, cache: "no-store" },
+			);
 
-		// 3️⃣ Aggregate languages (count repos per language, NOT bytes)
-		const languageCount: Record<string, number> = {};
-
-		await Promise.all(
-			repos.map(async (repo: any) => {
-				if (!repo.languages_url) return;
-
-				const langRes = await fetch(repo.languages_url, { headers });
-
-				if (!langRes.ok) return;
-
-				const langs = await langRes.json();
-
-				// ✅ each repo contributes ONE count per language it uses
-				for (const lang of Object.keys(langs)) {
-					languageCount[lang] = (languageCount[lang] || 0) + 1;
+			if (!reposRes.ok) {
+				if (reposRes.status === 403) {
+					return NextResponse.json(
+						{ error: "GitHub rate limit exceeded" },
+						{ status: 403 },
+					);
 				}
-			}),
-		);
+				break;
+			}
+
+			const repos = await reposRes.json();
+
+			if (repos.length === 0) {
+				hasMore = false;
+			} else {
+				allRepos = [...allRepos, ...repos];
+				page++;
+
+				if (repos.length < 100) {
+					hasMore = false;
+				}
+			}
+		}
+
+		const languageStats: Record<
+			string,
+			{ count: number; stars: number; forks: number }
+		> = {};
+
+		allRepos.forEach((repo: any) => {
+			const lang = repo.language;
+
+			if (!lang) return;
+
+			if (!languageStats[lang]) {
+				languageStats[lang] = {
+					count: 0,
+					stars: 0,
+					forks: 0,
+				};
+			}
+
+			languageStats[lang].count += 1;
+			languageStats[lang].stars += repo.stargazers_count;
+			languageStats[lang].forks += repo.forks_count;
+		});
+
+		// 4️⃣ Convert language stats into weighted score
+		const languages = Object.entries(languageStats).map(([name, data]) => ({
+			name,
+			repos: data.count,
+			stars: data.stars,
+			forks: data.forks,
+			score: data.count * 2 + data.stars + data.forks, // weighted impact
+		}));
+
+		// Sort strongest languages first
+		languages.sort((a, b) => b.score - a.score);
 
 		return NextResponse.json({
 			user,
-			repoCount: repos.length,
-			languages: languageCount,
-			repos: repos.map((r: any) => ({
+			repoCount: allRepos.length,
+			languages,
+			repos: allRepos.map((r: any) => ({
 				name: r.name,
+				language: r.language,
+				stars: r.stargazers_count,
+				forks: r.forks_count,
 				created_at: r.created_at,
 				updated_at: r.updated_at,
 				pushed_at: r.pushed_at,
+				html_url: r.html_url,
 			})),
 		});
 	} catch (err) {
+		console.error("Server error:", err);
 		return NextResponse.json({ error: "Server error" }, { status: 500 });
 	}
 }

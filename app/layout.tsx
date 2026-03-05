@@ -1,25 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
+import { Sora, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import DarkVeil from "@/components/DarkVeil";
+import Beams from "@/components/Beams";
 
-const fontSans = Inter({
+const sora = Sora({
 	subsets: ["latin"],
-	variable: "--font-sans",
+	variable: "--font-heading",
+	weight: ["500", "600", "700"],
 });
-
-const fontSerif = Source_Serif_4({
+const inter = Inter({
 	subsets: ["latin"],
-	variable: "--font-serif",
-});
-
-const fontMono = JetBrains_Mono({
-	subsets: ["latin"],
-	variable: "--font-mono",
+	variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -43,7 +39,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${fontSans.className} ${fontSerif.className} ${fontMono.className} antialiased`}
+				className={`${sora.className} ${inter.className} antialiased`}
 			>
 				<ThemeProvider
 					attribute="class"
@@ -71,8 +67,8 @@ export default function RootLayout({
 										beamWidth={3}
 										beamHeight={30}
 										beamNumber={20}
-										lightColor="#ffffff"
-										speed={2}
+										lightColor="#b63cff"
+										speed={6}
 										noiseIntensity={1.75}
 										scale={0.2}
 										rotation={300}

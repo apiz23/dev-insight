@@ -16,9 +16,15 @@ import {
 } from "@/components/ui/chart";
 
 type Props = {
-	languages: Record<string, number>;
+	languages: {
+		name: string;
+		repos: number;
+		stars: number;
+		forks: number;
+		score: number;
+	}[];
+	totalRepos?: number;
 };
-
 const CHART_COLORS = [
 	"var(--chart-1)",
 	"var(--chart-2)",
@@ -27,9 +33,8 @@ const CHART_COLORS = [
 	"var(--chart-5)",
 ];
 
-export function LanguagePie({ languages }: Props) {
-	const entries = Object.entries(languages);
-
+export function LanguagePie({ languages, totalRepos }: Props) {
+	const entries = languages;
 	if (entries.length === 0) {
 		return (
 			<Card className="border-border/10 shadow-sm bg-card flex flex-col">
@@ -41,7 +46,7 @@ export function LanguagePie({ languages }: Props) {
 						Top languages by usage
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">
+				<CardContent className="flex items-center justify-center h-65 text-muted-foreground text-sm">
 					No language data available
 				</CardContent>
 			</Card>
@@ -49,18 +54,18 @@ export function LanguagePie({ languages }: Props) {
 	}
 
 	// Sort by count descending and take top 6
-	const sorted = entries.sort((a, b) => b[1] - a[1]).slice(0, 6);
-	const total = sorted.reduce((sum, [, v]) => sum + v, 0);
-
-	// Calculate percentages and prepare chart data (using visitors as dataKey like the example)
-	const chartData = sorted.map(([name, value], i) => ({
-		browser: name.toLowerCase().replace(/\s+/g, ""),
-		language: name,
-		visitors: value,
+	const sorted = [...entries].sort((a, b) => b.repos - a.repos).slice(0, 6);
+	const totalOccurrences = sorted.reduce((sum, lang) => sum + lang.repos, 0);
+	// Calculate percentages and prepare chart data
+	const chartData = sorted.map((lang, i) => ({
+		browser: lang.name.toLowerCase().replace(/\s+/g, ""),
+		language: lang.name,
+		visitors: lang.repos,
 		fill: CHART_COLORS[i % CHART_COLORS.length],
+		percentage: totalRepos ? Math.round((lang.repos / totalRepos) * 100) : 0,
 	}));
 
-	// Build chart config dynamically (matching the example pattern)
+	// Build chart config dynamically
 	const chartConfig = {
 		visitors: {
 			label: "Repositories",
@@ -109,10 +114,12 @@ export function LanguagePie({ languages }: Props) {
 										}
 
 										const item = chartData.find((d) => d.browser === name);
-										const percentage = Math.round((numValue / total) * 100);
+										const percentage = totalRepos
+											? Math.round((numValue / totalRepos) * 100)
+											: Math.round((numValue / totalOccurrences) * 100);
 
 										return [
-											`${numValue.toLocaleString()} (${percentage}%)`,
+											`${numValue} repo${numValue !== 1 ? "s" : ""} (${percentage}%)`,
 											item?.language || String(name),
 										];
 									}}
@@ -123,21 +130,38 @@ export function LanguagePie({ languages }: Props) {
 							data={chartData}
 							dataKey="visitors"
 							nameKey="browser"
-							label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+							label={({ payload }) => {
+								const percentage = totalRepos
+									? Math.round((payload.visitors / totalRepos) * 100)
+									: Math.round((payload.visitors / totalOccurrences) * 100);
+								return `${percentage}%`;
+							}}
 							labelLine={false}
 						/>
 					</PieChart>
 				</ChartContainer>
 			</CardContent>
 
-			{/* Footer with total count (similar to example footer) */}
-			<div className="mt-2 pb-4 px-6 text-center">
+			{/* Footer with clear information */}
+			<div className="mt-2 pb-4 px-6 space-y-1 text-center">
 				<p className="text-xs text-muted-foreground">
-					Total:{" "}
-					<span className="font-semibold text-foreground">
-						{total.toLocaleString()} repositories
-					</span>
+					<span className="font-semibold text-foreground">{totalOccurrences}</span>{" "}
+					total language occurrences
+					{totalRepos && (
+						<>
+							{" "}
+							across{" "}
+							<span className="font-semibold text-foreground">{totalRepos}</span>{" "}
+							repositories
+						</>
+					)}
 				</p>
+				{totalRepos && (
+					<p className="text-xs text-muted-foreground">
+						Average {(totalOccurrences / totalRepos).toFixed(1)} languages per
+						repository
+					</p>
+				)}
 			</div>
 		</Card>
 	);

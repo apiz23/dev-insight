@@ -44,7 +44,7 @@ export default function Footer() {
 			{/* Decorative linear line */}
 			<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-primary/20 to-transparent" />
 
-			<div className="max-w-5xl mx-auto px-4 py-8 relative">
+			<div className="max-w-4xl mx-auto px-4 py-8 relative">
 				{/* Main footer content */}
 				<div className="flex flex-col lg:flex-row items-center justify-between gap-6">
 					{/* Brand section */}
