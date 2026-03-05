@@ -7,16 +7,12 @@ import {
 	Calendar,
 	Code2,
 	Github,
-	QrCode,
-	Sparkles,
-	Trophy,
 	MapPin,
 	Users,
 	GitFork,
 	Star,
 	Hash,
 	Zap,
-	Shield,
 	Monitor,
 } from "lucide-react";
 import Image from "next/image";
@@ -24,6 +20,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 interface DeveloperPassProps {
 	user: any;
@@ -58,20 +55,29 @@ export function DeveloperPass({
 	const downloadPass = async () => {
 		if (!cardRef.current) return;
 
-		const dataUrl = await toPng(cardRef.current, {
-			cacheBust: true,
-			backgroundColor: "transparent",
-			style: {
-				background: "transparent",
-			},
-			pixelRatio: 3,
-			fontEmbedCSS: "",
-		});
+		await toast.promise(
+			(async () => {
+				const dataUrl = await toPng(cardRef.current!, {
+					cacheBust: true,
+					backgroundColor: "transparent",
+					style: {
+						background: "transparent",
+					},
+					pixelRatio: 3,
+					fontEmbedCSS: "",
+				});
 
-		const link = document.createElement("a");
-		link.download = `${user?.login}-devpass.png`;
-		link.href = dataUrl;
-		link.click();
+				const link = document.createElement("a");
+				link.download = `${user?.login}-devpass.png`;
+				link.href = dataUrl;
+				link.click();
+			})(),
+			{
+				loading: "Generating DevPass...",
+				success: "DevPass downloaded successfully 🎉",
+				error: "Failed to generate DevPass",
+			},
+		);
 	};
 
 	const formatNumber = (num: number) => {
@@ -140,10 +146,10 @@ export function DeveloperPass({
 			<div className="w-full">
 				<div
 					ref={cardRef}
-					className="relative flex min-w-225 max-w-4xl flex-row shadow-2xl"
+					className="bg-transparent relative flex min-w-225 max-w-4xl flex-row"
 				>
 					{/* Main Section (Left) */}
-					<div className="relative flex-1 p-8 md:p-10 overflow-hidden rounded-3xl md:rounded-r-none md:rounded-l-3xl border border-primary/20 bg-linear-to-br from-card/40 to-card/10">
+					<div className="bg-black relative flex-1 p-8 md:p-10 overflow-hidden border border-primary/20 bg-linear-to-br from-card/40 to-card/10">
 						{/* Static Background */}
 						<div className="absolute inset-0 pointer-events-none">
 							<div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-accent/5" />
@@ -275,11 +281,10 @@ export function DeveloperPass({
 					</div>
 
 					{/* Stub Section (Right) */}
-					<div className="relative flex w-80 flex-col items-center justify-center p-8 rounded-3xl md:rounded-l-none md:rounded-r-3xl border border-primary/20 border-t-0 md:border-t md:border-l-0 bg-linear-to-br from-primary/10 to-primary/5 overflow-hidden">
+					<div className="bg-black relative flex w-80 flex-col items-center justify-center p-8 border border-primary/20 border-t-0 md:border-t md:border-l-0 bg-linear-to-br from-primary/10 to-primary/5 overflow-hidden">
 						{/* Static Background */}
-						<div className="absolute inset-0 bg-[radial-linear(circle_at_50%_50%,hsl(var(--primary)/0.1),transparent_70%)]" />
 						<div className="absolute top-0 right-0 p-4">
-							<Trophy className="h-12 w-12 text-primary/20" />
+							<Github className="h-14 w-14 text-primary/20" />
 						</div>
 
 						<div className="relative z-10 space-y-1 text-center">
@@ -357,8 +362,8 @@ export function DeveloperPass({
 							</div>
 
 							{/* Verification Badge */}
-							<div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground border-t border-primary/10 pt-4">
-								<div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+							<div className="flex items-center justify-center gap-1.5 text-[14px] text-muted-foreground border-t border-primary/10 pt-4">
+								<div className="h-2 w-2 rounded-full bg-green-500" />
 								<span>DevInsight</span>
 								<div className="w-7 h-7 relative">
 									<Image

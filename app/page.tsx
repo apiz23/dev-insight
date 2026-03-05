@@ -48,7 +48,12 @@ import { DeveloperRadar } from "@/components/charts/developer-radar";
 import { ActivityTimeline } from "@/components/charts/activity-timeline";
 import { LanguagePie } from "@/components/charts/language-pie";
 import { generateAISummary } from "@/lib/ai";
-import { DetailCard, LanguageBar, MetricBar, StatCard } from "@/components/helper-card";
+import {
+	DetailCard,
+	LanguageBar,
+	MetricBar,
+	StatCard,
+} from "@/components/helper-card";
 import {
 	Tooltip,
 	TooltipContent,
@@ -83,6 +88,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function Home() {
 	const [username, setUsername] = useState("");
@@ -110,46 +116,52 @@ export default function Home() {
 		setRateLimit(false);
 		setAiSummary(null);
 
-		try {
-			const res = await fetch(`/api/github?username=${username}`);
-			const data = await res.json();
+		toast.promise(
+			(async () => {
+				try {
+					const res = await fetch(`/api/github?username=${username}`);
+					const data = await res.json();
 
-			if (res.status === 403) {
-				setRateLimit(true);
-				setUser(null);
-				setLoading(false);
-				return;
-			}
+					if (res.status === 403) {
+						setRateLimit(true);
+						setUser(null);
+						throw new Error("GitHub API rate limit exceeded");
+					}
 
-			if (!res.ok) {
-				throw new Error(data.error || "Failed to fetch user");
-			}
+					if (!res.ok) {
+						throw new Error(data.error || "Failed to fetch user");
+					}
 
-			const parsed: GitHubResponse = data;
+					const parsed: GitHubResponse = data;
 
-			const languageMap: Record<string, number> = {};
-			parsed.languages.forEach((lang) => {
-				languageMap[lang.name] = lang.repos;
-			});
+					const languageMap: Record<string, number> = {};
+					parsed.languages.forEach((lang) => {
+						languageMap[lang.name] = lang.repos;
+					});
 
-			const computedScore = calculateDeveloperScore({
-				repoCount: parsed.repoCount,
-				languages: languageMap,
-				createdAt: parsed.user.created_at,
-			});
+					const computedScore = calculateDeveloperScore({
+						repoCount: parsed.repoCount,
+						languages: languageMap,
+						createdAt: parsed.user.created_at,
+					});
 
-			setUser(parsed.user);
-			setLanguages(parsed.languages);
-			setRepoCount(parsed.repoCount);
-			setScore(computedScore);
-			setRepos(parsed.repos || []);
+					setUser(parsed.user);
+					setLanguages(parsed.languages);
+					setRepoCount(parsed.repoCount);
+					setScore(computedScore);
+					setRepos(parsed.repos || []);
 
-			await fetchAI(parsed, computedScore);
-		} catch (err: any) {
-			setError(err.message || "Failed to fetch user");
-			setUser(null);
-			setLoading(false);
-		}
+					await fetchAI(parsed, computedScore);
+				} finally {
+					setLoading(false);
+				}
+			})(),
+			{
+				loading: "Analyzing GitHub profile...",
+				success: `Dev ${username} analyzed successfully 🚀`,
+				error: (err) => err.message || "Failed to analyze developer",
+			},
+		);
 	};
 
 	const formatDate = (dateString: string) => {
@@ -200,16 +212,21 @@ Score: ${computedScore.total}
 Level: ${computedScore.level}
 `.trim();
 
-		try {
-			setAiLoading(true);
-			const res: AISummary = await generateAISummary(summary);
-			setAiSummary(res);
-		} catch (err) {
-			console.error(err);
-		} finally {
-			setAiLoading(false);
-			setLoading(false);
-		}
+		setAiLoading(true);
+
+		await toast.promise(
+			(async () => {
+				const res: AISummary = await generateAISummary(summary);
+				setAiSummary(res);
+			})(),
+			{
+				loading: "Generating AI insights...",
+				success: "AI insights generated 🧠",
+				error: "Failed to generate AI insights",
+			},
+		);
+
+		setAiLoading(false);
 	};
 
 	const topLanguage = languages?.[0]?.name;
@@ -1198,4 +1215,3 @@ Level: ${computedScore.level}
 		</TooltipProvider>
 	);
 }
-

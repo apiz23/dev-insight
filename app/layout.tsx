@@ -3,7 +3,7 @@ import { Sora, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Navbar from "@/components/navbar";
+import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/footer";
 import DarkVeil from "@/components/DarkVeil";
 import Beams from "@/components/Beams";
@@ -38,9 +38,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body
-				className={`${sora.className} ${inter.className} antialiased`}
-			>
+			<body className={`${sora.className} ${inter.className} antialiased`}>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
@@ -78,7 +76,10 @@ export default function RootLayout({
 
 							{/* Content */}
 							{/* <Navbar /> */}
-							<main className="flex-1 relative z-0 ">{children}</main>
+							<main className="flex-1 relative z-0 ">
+								<Toaster richColors position="top-center" />
+								{children}
+							</main>
 							<Footer />
 						</div>
 					</TooltipProvider>
