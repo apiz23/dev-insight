@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/footer";
 import DarkVeil from "@/components/DarkVeil";
 import Beams from "@/components/Beams";
+import { Analytics } from "@vercel/analytics/next";
 
 const sora = Sora({
 	subsets: ["latin"],
@@ -78,6 +79,7 @@ export default function RootLayout({
 							{/* <Navbar /> */}
 							<main className="flex-1 relative z-0 ">
 								<Toaster richColors position="top-center" />
+								<Analytics />
 								{children}
 							</main>
 							<Footer />
