@@ -142,7 +142,7 @@ export function DeveloperPass({
 	}
 
 	return (
-		<div className="flex min-h-125 w-full items-center justify-start p-4 overflow-x-auto">
+		<div className="flex min-h-150 w-full items-center justify-start p-4 overflow-x-auto">
 			<div className="w-full">
 				<div
 					ref={cardRef}
