@@ -259,7 +259,7 @@ export function DeveloperPass({
 									<div className="flex items-center gap-2 bg-accent/10 px-3 py-2 rounded-lg border border-accent/90">
 										<Zap className="h-4 w-4 text-accent" />
 										<span className="text-sm font-bold">
-											{Math.round(score?.breakdown?.experience || 0)}%
+											{Math.round(((score?.breakdown?.experience || 0) / 15) * 100)}%
 										</span>
 									</div>
 								</div>

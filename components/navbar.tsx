@@ -1,8 +1,3 @@
-"use client";
-
-import { ModeToggle } from "./mode-toggle";
-import { Button } from "./ui/button";
-import Link from "next/link";
 import Image from "next/image";
 
 export default function Navbar() {

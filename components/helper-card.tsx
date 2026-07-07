@@ -22,9 +22,6 @@ export function StatCard({
 			transition={{ type: "spring", stiffness: 300, damping: 20 }}
 			className={`relative overflow-hidden p-4 rounded-xl border bg-linear-to-br ${color} backdrop-blur-sm transition-all hover:shadow-md`}
 		>
-			{/* Background Pattern */}
-			<div className="absolute inset-0 bg-grid-white/5 mask-[radial-linear(ellipse_at_center,transparent_60%,black)]" />
-
 			{/* Content */}
 			<div className="relative z-10">
 				<div className="flex items-center justify-between mb-2">
@@ -91,11 +88,13 @@ export function DetailCard({
 export function MetricBar({
 	label,
 	value,
+	max = 25,
 	icon: Icon,
 	description,
 }: {
 	label: string;
 	value: number;
+	max?: number;
 	icon: any;
 	description: string;
 }) {
@@ -106,9 +105,14 @@ export function MetricBar({
 					<Icon className="h-4 w-4 text-primary" />
 					<span className="font-medium">{label}</span>
 				</div>
-				<span className="text-sm font-bold text-primary">{value}/100</span>
+				<span className="text-sm font-bold text-primary">
+					{value}/{max}
+				</span>
 			</div>
-			<Progress value={(value / 25) * 100} className="h-2 [&>div]:bg-primary" />
+			<Progress
+				value={(value / max) * 100}
+				className="h-2 [&>div]:bg-primary"
+			/>
 			<p className="text-xs text-muted-foreground">{description}</p>
 		</div>
 	);

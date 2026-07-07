@@ -57,7 +57,6 @@ import {
 import {
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
@@ -234,8 +233,7 @@ Level: ${computedScore.level}
 	const totalForks = languages?.reduce((sum, lang) => sum + lang.forks, 0) || 0;
 
 	return (
-		<TooltipProvider>
-			<div className="min-h-screen text-foreground">
+		<div className="min-h-screen text-foreground">
 				{/* Hero Section */}
 				<section className="relative overflow-hidden py-16">
 					<div className="max-w-4xl mx-auto px-4">
@@ -248,7 +246,7 @@ Level: ${computedScore.level}
 							<motion.div
 								whileHover={{ scale: 1.02 }}
 								transition={{ duration: 0.2 }}
-								className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 cursor-pointer bg-black"
+								className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 cursor-pointer bg-accent"
 							>
 								<div className="relative w-8 h-8">
 									<Image
@@ -465,7 +463,7 @@ Level: ${computedScore.level}
 											<div
 												className="absolute inset-0"
 												style={{
-													backgroundImage: `radial-linear(circle at 2px 2px, ${getComputedStyle(document.documentElement).getPropertyValue("--primary")} 1px, transparent 0)`,
+													backgroundImage: `radial-gradient(circle at 2px 2px, ${getComputedStyle(document.documentElement).getPropertyValue("--primary")} 1px, transparent 0)`,
 													backgroundSize: "24px 24px",
 												}}
 											/>
@@ -475,13 +473,13 @@ Level: ${computedScore.level}
 											<div className="absolute inset-0 bg-linear-to-r from-primary/20 via-primary/10 to-chart-2/20" />
 
 											<div className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-700">
-												<div className="absolute inset-0 bg-[radial-linear(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_50%)]" />
-												<div className="absolute inset-0 bg-[radial-linear(circle_at_80%_80%,hsl(var(--chart-2)/0.1),transparent_50%)]" />
+												<div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_50%)]" />
+												<div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,hsl(var(--chart-2)/0.1),transparent_50%)]" />
 											</div>
 											<div
 												className="absolute inset-0 opacity-[0.02]"
 												style={{
-													backgroundImage: `repeating-linear-linear(45deg, var(--primary) 0px, var(--primary) 1px, transparent 1px, transparent 12px)`,
+													backgroundImage: `repeating-linear-gradient(45deg, var(--primary) 0px, var(--primary) 1px, transparent 1px, transparent 12px)`,
 												}}
 											/>
 											<div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
@@ -765,10 +763,10 @@ Level: ${computedScore.level}
 									{/* Section Selector */}
 									<div className="space-y-4">
 										<Select value={tab} onValueChange={setTab}>
-											<SelectTrigger className="min-w-50 bg-white border border-border ">
+											<SelectTrigger className="min-w-50">
 												<SelectValue placeholder="Select section" />
 											</SelectTrigger>
-											<SelectContent className="bg-black">
+											<SelectContent>
 												<SelectItem value="breakdown">Score Breakdown</SelectItem>
 												<SelectItem value="languages">Languages</SelectItem>
 												<SelectItem value="repos">Repositories</SelectItem>
@@ -798,36 +796,42 @@ Level: ${computedScore.level}
 															<MetricBar
 																label="Activity"
 																value={score.breakdown.activity}
+																max={25}
 																icon={Activity}
 																description="Based on repository count"
 															/>
 															<MetricBar
 																label="Consistency"
 																value={score.breakdown.consistency}
+																max={20}
 																icon={TrendingUp}
 																description="Repositories per year"
 															/>
 															<MetricBar
 																label="Experience"
 																value={score.breakdown.experience}
+																max={15}
 																icon={Clock}
 																description="Account age and longevity"
 															/>
 															<MetricBar
 																label="Diversity"
 																value={score.breakdown.diversity}
+																max={15}
 																icon={PieChart}
 																description="Range of programming languages"
 															/>
 															<MetricBar
 																label="Focus"
 																value={score.breakdown.focus}
+																max={10}
 																icon={Target}
 																description="Primary language dominance"
 															/>
 															<MetricBar
 																label="Momentum"
 																value={score.breakdown.momentum}
+																max={15}
 																icon={Zap}
 																description="Recent activity pace"
 															/>
@@ -1011,7 +1015,6 @@ Level: ${computedScore.level}
 										)}
 									</AnimatePresence>
 
-									{/* AI Summary */}
 									{/* AI Summary */}
 									<AnimatePresence>
 										{aiSummary && !aiLoading && (
@@ -1212,6 +1215,5 @@ Level: ${computedScore.level}
 					</div>
 				</div>
 			</div>
-		</TooltipProvider>
 	);
 }

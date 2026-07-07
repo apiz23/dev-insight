@@ -1,25 +1,28 @@
 import type { Metadata } from "next";
-import { Sora, Inter } from "next/font/google";
+import { Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/footer";
-import DarkVeil from "@/components/DarkVeil";
-import Beams from "@/components/Beams";
+import SiteBackground from "@/components/site-background";
 import { Analytics } from "@vercel/analytics/next";
+import Navbar from "@/components/navbar";
 
-const sora = Sora({
+const geistMono = Geist_Mono({
 	subsets: ["latin"],
-	variable: "--font-heading",
-	weight: ["500", "600", "700"],
+	variable: "--font-sans",
 });
-const inter = Inter({
+const jetbrainsMono = JetBrains_Mono({
 	subsets: ["latin"],
-	variable: "--font-body",
+	variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
+	metadataBase: new URL(
+		process.env.VERCEL_URL
+			? `https://${process.env.VERCEL_URL}`
+			: "http://localhost:3000",
+	),
 	title: "DevInsight — GitHub Developer Analytics",
 	description:
 		"Analyze GitHub developer activity, consistency, and language usage with an interactive analytics dashboard built using Next.js.",
@@ -30,6 +33,17 @@ export const metadata: Metadata = {
 		"data visualization",
 		"portfolio project",
 	],
+	icons: {
+		icon: "/icons/favicon-32x32.png",
+		shortcut: "/favicon.ico",
+		apple: "/icons/favicon-32x32.png",
+	},
+	openGraph: {
+		title: "DevInsight — GitHub Developer Analytics",
+		description:
+			"Analyze GitHub developer activity, consistency, and language usage with an interactive analytics dashboard built using Next.js.",
+		images: ["/icons/favicon-32x32.png"],
+	},
 };
 
 export default function RootLayout({
@@ -38,54 +52,24 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={`${sora.className} ${inter.className} antialiased`}>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="dark"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<TooltipProvider>
-						<div className="relative min-h-screen flex flex-col">
-							<div className="fixed inset-0 -z-10">
-								<div className="absolute inset-0" style={{ filter: "blur(2px)" }}>
-									<DarkVeil
-										hueShift={0}
-										noiseIntensity={0}
-										scanlineIntensity={0}
-										speed={1.5}
-										scanlineFrequency={0}
-										warpAmount={2}
-									/>
-								</div>
-							</div>
-							{/* <div className="fixed inset-0 -z-10">
-								<div className="absolute inset-0" style={{ filter: "blur(5px)" }}>
-									<Beams
-										beamWidth={3}
-										beamHeight={30}
-										beamNumber={20}
-										lightColor="#b63cff"
-										speed={6}
-										noiseIntensity={1.75}
-										scale={0.2}
-										rotation={300}
-									/>
-								</div>
-							</div> */}
+		<html lang="en" className="dark">
+			<body
+				className={`${geistMono.variable} ${jetbrainsMono.variable} antialiased`}
+			>
+				<TooltipProvider>
+					<div className="relative min-h-screen flex flex-col">
+						<SiteBackground />
 
-							{/* Content */}
-							{/* <Navbar /> */}
-							<main className="flex-1 relative z-0 ">
-								<Toaster richColors position="top-center" />
-								<Analytics />
-								{children}
-							</main>
-							<Footer />
-						</div>
-					</TooltipProvider>
-				</ThemeProvider>
+						{/* Content */}
+						<Navbar />
+						<main className="flex-1 relative z-0 ">
+							<Toaster richColors position="top-center" />
+							<Analytics />
+							{children}
+						</main>
+						<Footer />
+					</div>
+				</TooltipProvider>
 			</body>
 		</html>
 	);
